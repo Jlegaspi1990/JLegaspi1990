@@ -1,0 +1,65 @@
+- index.html
+- script.js
+- styles.css
+- soil_data.json
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Data Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Soil NPK and pH Map of the Philippines</h1>
+    <div id="map"></div>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    font-family: Arial, sans-serif;
+}
+
+#map {
+    height: 80vh;
+    width: 100%;
+}
+// Initialize and add the map
+function initMap() {
+    // Center map on the Philippines
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 6,
+        center: { lat: 12.8797, lng: 121.7740 }  // Center at the Philippines
+    });
+
+    // Load soil data from JSON file
+    fetch('soil_data.json')
+        .then(response => response.json())
+        .then(soilData => {
+            soilData.forEach(data => {
+                var marker = new google.maps.Marker({
+                    position: { lat: data.Latitude, lng: data.Longitude },
+                    map: map
+                });
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: `NPK: ${data.N}, ${data.P}, ${data.K}<br>pH: ${data.pH}`
+                });
+
+                marker.addListener('click', function () {
+                    infoWindow.open(map, marker);
+                });
+            });
+        })
+        .catch(error => console.error('Error loading data:', error));
+}
+
+// Initialize the map on window load
+window.onload = initMap;
+[
+    {"Latitude": 10.3157, "Longitude": 123.8854, "N": 14, "P": 6, "K": 12, "pH": 6.5},
+    {"Latitude": 10.3157, "Longitude": 123.8850, "N": 16, "P": 8, "K": 10, "pH": 6.8},
+    {"Latitude": 9.3068, "Longitude": 123.3135, "N": 18, "P": 7, "K": 14, "pH": 7.0}
+    // Add the remaining 7 entries here
+]
